@@ -73,7 +73,6 @@
     </div>
 @endsection
 @section('scripts')
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
         function previewImage() {
             const imageFile = document.querySelector('#imageFile');
@@ -88,4 +87,5 @@
             const blob = URL.createObjectURL(imageFile.files[0]);
             imgPreview.src = blob;
         }
+    </script>
 @endsection

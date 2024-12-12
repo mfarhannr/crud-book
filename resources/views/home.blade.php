@@ -13,7 +13,7 @@
                 <div class="card-header">{{ __('Categories') }}</div>
 
                 <div class="card-body">
-                    1
+                    {{$categories}}
                 </div>
             </div>
         </div>
@@ -22,7 +22,7 @@
                 <div class="card-header">{{ __('Books') }}</div>
 
                 <div class="card-body">
-                    1
+                    {{$books}}
                 </div>
             </div>
         </div>

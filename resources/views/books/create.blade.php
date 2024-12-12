@@ -14,17 +14,23 @@
                                 <div class="card-body">
                                     <div class="mb-3">
                                         <label for="name" class="form-label">Book Name</label>
-                                        <input type="text" name="name" class="form-control" id="name">
+                                        <input type="text" name="name" class="form-control" id="name" value="{{ old('name') }}">
                                         @error('name')
-                                            <p class='text-danger mb-0 text-xs pt-1'> {{ $message }} </p>
+                                            <p class='text-danger mb-0 text-xs pt-1'>{{ $message }}</p>
                                         @enderror
                                     </div>
                                     <div class="mb-3">
-                                        <label for="description" class="form-label">description</label>
-                                        <div id="description" style="height:330px;"></div>
-                                        <textarea class="form-control" name="description" id="content-textarea" hidden style="display: none;"></textarea>
+                                        <label for="author" class="form-label">Author</label>
+                                        <input type="text" name="author" class="form-control" id="author" value="{{ old('author') }}">
+                                        @error('author')
+                                            <p class="text-danger mb-0 text-xs pt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Description</label>
+                                        <textarea class="form-control" name="description" id="description" rows="10">{{ old('description') }}</textarea>
                                         @error('description')
-                                            <p class='text-danger mb-0 text-xs pt-1'> {{ $message }} </p>
+                                            <p class="text-danger mb-0 text-xs pt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
                                 </div>
@@ -34,19 +40,14 @@
                             <div class="card mb-3">
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <div class="card shadow-none border text-center">
-                                            <label class="form-label border-dashed cursor-pointer" id="label"
-                                                style="border-radius:10px;" for="imageFile">Add Thumbnail
-                                                <img class="img-preview img-fluid mb-2 mx-auto">
-                                                <img src="{{ asset('img/imageplus.png') }}" id="plusimg"
-                                                    class="img-fluid p-md-3" alt="">
-                                                <input accept="image/*" type="file" name="thumbnail"
-                                                    class="form-control mt-3" id="imageFile" onchange="previewImage()">
-                                            </label>
-                                            @error('thumbnail')
-                                                <p class='text-danger mb-0 text-xs pt-1'> {{ $message }} </p>
-                                            @enderror
+                                        <label for="imageFile" class="form-label">Add Thumbnail</label>
+                                        <div class="text-center">
+                                            <img id="imgPreview" src="{{ asset('img/image-preview.png') }}" class="img-fluid mb-3" alt="Preview">
+                                            <input type="file" name="thumbnail" class="form-control" id="imageFile" onchange="previewImage()">
                                         </div>
+                                        @error('thumbnail')
+                                            <p class='text-danger mb-0 text-xs pt-1'>{{ $message }}</p>
+                                        @enderror
                                     </div>
                                     <div class="mb-3">
                                         <label for="kategoriSelect" class="form-label">Book Category</label>
@@ -74,19 +75,19 @@
     </div>
 @endsection
 @section('scripts')
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
-        function previewImage() {
-            const imageFile = document.querySelector('#imageFile');
-            const imgPreview = document.querySelector('.img-preview');
-            const label = document.querySelector('#label');
-            const img = document.querySelector('#plusimg');
+         function previewImage() {
+            const imageFile = document.getElementById('imageFile');
+            const imgPreview = document.getElementById('imgPreview');
+            const file = imageFile.files[0];
 
-            img.style.display = 'none';
-            label.style.border = 0;
-            imgPreview.style.display = 'block';
-
-            const blob = URL.createObjectURL(imageFile.files[0]);
-            imgPreview.src = blob;
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imgPreview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
         }
+    </script>
 @endsection

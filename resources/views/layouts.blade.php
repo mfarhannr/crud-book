@@ -31,10 +31,10 @@
                             <a class="nav-link" aria-current="page" href="/">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/categories">Categories</a>
+                            <a class="nav-link" aria-current="page" href="/category">Category</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/books">Books</a>
+                            <a class="nav-link" aria-current="page" href="/book">Book</a>
                         </li>
                     </ul>
                 </div>

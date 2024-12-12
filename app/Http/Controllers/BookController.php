@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Book_Category;
 use File;
+use App\Imports\BooksImport;
+use App\Exports\BooksExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 use Illuminate\Http\Request;
 
@@ -27,24 +31,30 @@ class BookController extends Controller
         $request->validate([
             'name' => 'required|unique:books',
             'book_category_id' => 'required',
+            'thumbnail'        => 'nullable|image|mimes:jpg,png,jpeg',
             'description' => 'required',
             'author' => 'required',
         ]);
 
-        $thumbnail = time() . '.' . $request->thumbnail->extension();
+        $thumbnailName = null;
 
-        $request->thumbnail->move(public_path('img/thumbnail'), $thumbnail);
+        // Proses upload thumbnail jika ada
+        if ($request->hasFile('thumbnail')) {
+            $thumbnailName = time() . '.' . $request->thumbnail->extension();
+            $request->thumbnail->move(public_path('img/thumbnail'), $thumbnailName);
+        }
 
         $book = new Book;
 
-        $book->book_category_id = $request->kategori_id;
-        $book->name       = $request->judul;
-        $book->thumbnail     = $thumbnail;
+        $book->book_category_id = $request->book_category_id;
+        $book->name       = $request->name;
+        $book->thumbnail = $thumbnailName ?: $book->thumbnail;
         $book->description        = $request->description;
+        $book->author        = $request->author;
 
         $book->save();
 
-        return redirect()->route('books.index')->with('success', 'Book created successfully.');
+        return redirect()->route('book.index')->with('success', 'Book created successfully.');
     }
 
     public function edit($id)
@@ -59,6 +69,7 @@ class BookController extends Controller
         $request->validate([
             'name' => 'required|unique:books,name,',
             'book_category_id' => 'required',
+            'thumbnail'        => 'image|mimes:jpg,png,jpeg',
             'description' => 'required',
             'author' => 'required',
         ]);
@@ -69,14 +80,15 @@ class BookController extends Controller
             $path = "img/thumbnail/";
             File::delete($path . $book->thumbnail);
 
-            $thumbnail = time() . '.' . $request->thumbnail->extension();
+            $thumbnailName = time() . '.' . $request->thumbnail->extension();
 
-            $request->thumbnail->move(public_path('img/thumbnail'), $thumbnail);
+            $request->thumbnail->move(public_path('img/thumbnail'), $thumbnailName);
 
-            $book->book_category_id = $request->kategori_id;
-            $book->name       = $request->judul;
-            $book->thumbnail     = $thumbnail;
+            $book->book_category_id = $request->book_category_id;
+            $book->name       = $request->name;
+            $book->thumbnail = $thumbnailName ?: $book->thumbnail;
             $book->description        = $request->description;
+            $book->author        = $request->author;
 
             $book->save();
 
@@ -85,12 +97,13 @@ class BookController extends Controller
             $book = book::find($id);
 
             $book->book_category_id = $request->kategori_id;
-            $book->name       = $request->judul;
+            $book->name       = $request->name;
             $book->description        = $request->description;
+            $book->author        = $request->author;
 
             $book->save();
 
-            return redirect()->route('books.index')->with('success', 'Book updated successfully.');
+            return redirect()->route('book.index')->with('success', 'Book updated successfully.');
         }
     }
 
@@ -102,6 +115,18 @@ class BookController extends Controller
         File::delete($path . $book->thumbnail);
         $book->delete();
 
-        return redirect()->route('books.index')->with('success', 'Book deleted successfully.');
+        return redirect()->route('book.index')->with('success', 'Book deleted successfully.');
+    }
+
+    public function export()
+    {
+        return Excel::download(new BooksExport, 'books.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate(['file' => 'required|mimes:xlsx,xls']);
+        Excel::import(new BooksImport, $request->file('file'));
+        return redirect()->route('book.index')->with('success', 'Books imported successfully.');
     }
 }
